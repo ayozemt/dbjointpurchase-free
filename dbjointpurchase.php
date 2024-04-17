@@ -285,6 +285,27 @@ class Dbjointpurchase extends Module
 
     public function getProductsGenerate($id_product)
     {
+        $manual_related_products = Configuration::get('DBJOINT_MANUAL_RELATED_PRODUCTS');
+        if (!empty($manual_related_products)) {
+
+            $manual_related_products = explode(',', $manual_related_products);
+            $manual_related_products = array_map('trim', $manual_related_products);
+            $manual_related_products = array_filter($manual_related_products, 'is_numeric');
+
+            $products = [];
+            foreach ($manual_related_products as $related_product_id) {
+                $product = new Product($related_product_id);
+                if (Validate::isLoadedObject($product)) {
+                    $products[$product->id_category_default][] = array(
+                        'id_product' => $product->id,
+                        'price' => $product->price,
+                    );
+                }
+            }
+
+            return $products;
+        }
+
         $excludes = $this->getProductsExcludes();
 
         $products = [];
