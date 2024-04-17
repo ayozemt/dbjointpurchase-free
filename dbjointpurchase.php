@@ -34,7 +34,7 @@ class Dbjointpurchase extends Module
     public function __construct()
     {
         if (file_exists(dirname(__FILE__) . '/premium/DbPremium.php')) {
-            require_once(dirname(__FILE__) . '/premium/DbPremium.php');
+            require_once (dirname(__FILE__) . '/premium/DbPremium.php');
             $this->premium = 1;
         } else {
             $this->premium = 0;
@@ -86,7 +86,7 @@ class Dbjointpurchase extends Module
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitDbjointpurchaseModule')) == true) {
+        if (((bool) Tools::isSubmit('submitDbjointpurchaseModule')) == true) {
             $this->postProcess();
         }
 
@@ -154,6 +154,14 @@ class Dbjointpurchase extends Module
                         'name' => 'DBJOINT_EXCLUDE',
                         'class' => 'disabled',
                     ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Productos relacionados (IDs)'),
+                        'desc' => $this->l(
+                            'Inserte hasta 3 ids de productos relacionados separados por comas.'
+                        ),
+                        'name' => 'DBJOINT_MANUAL_RELATED_PRODUCTS',
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -209,13 +217,15 @@ class Dbjointpurchase extends Module
     {
         $this->context->controller->addJS($this->_path . 'views/js/dbjointpurchase.js');
         $this->context->controller->addCSS($this->_path . 'views/css/dbjointpurchase.css');
-        Media::addJsDef(array(
-                            'dbjointpurchase_ajax' => Context::getContext()->link->getModuleLink(
-                                'dbjointpurchase',
-                                'ajax',
-                                array()
-                            ),
-                        ));
+        Media::addJsDef(
+            array(
+                'dbjointpurchase_ajax' => Context::getContext()->link->getModuleLink(
+                    'dbjointpurchase',
+                    'ajax',
+                    array()
+                ),
+            )
+        );
 
         $color_joint = Configuration::get('DBJOINT_COLOR');
         if (empty($color_joint)) {
@@ -237,10 +247,12 @@ class Dbjointpurchase extends Module
         $total_price = $params['product']->price_amount;
         $products_cat = $this->getProductsGenerate($id_product);
         if ($products_cat != false && $product['add_to_cart_url']) {
-            if (!$this->isCached(
-                'module:dbjointpurchase/views/templates/hook/jointpurchase.tpl',
-                $this->getCacheId($key)
-            )) {
+            if (
+                !$this->isCached(
+                    'module:dbjointpurchase/views/templates/hook/jointpurchase.tpl',
+                    $this->getCacheId($key)
+                )
+            ) {
                 $productos = [];
                 foreach ($products_cat as $key => $products) {
                     $productos[$key] = $this->prepareBlocksProducts($products);
@@ -248,11 +260,13 @@ class Dbjointpurchase extends Module
                         $total_price += $pr['price_amount'];
                     }
                 }
-                $this->smarty->assign(array(
-                                          'productos' => $productos,
-                                          'total_price' => $total_price,
-                                          'premium' => $this->premium,
-                                      ));
+                $this->smarty->assign(
+                    array(
+                        'productos' => $productos,
+                        'total_price' => $total_price,
+                        'premium' => $this->premium,
+                    )
+                );
             }
 
             return $this->fetch('module:dbjointpurchase/views/templates/hook/jointpurchase.tpl');
@@ -391,12 +405,14 @@ class Dbjointpurchase extends Module
             $products = array_merge($bestproduct, $products);
             $productos = $this->prepareBlocksProducts($products);
 
-            $this->smarty->assign(array(
-                                      'productos' => $productos,
-                                      'key' => $key,
-                                      'current_product' => $id_current_product,
-                                      'premium' => $this->premium,
-                                  ));
+            $this->smarty->assign(
+                array(
+                    'productos' => $productos,
+                    'key' => $key,
+                    'current_product' => $id_current_product,
+                    'premium' => $this->premium,
+                )
+            );
             return $this->fetch('module:dbjointpurchase/views/templates/hook/modal_joint.tpl');
         }
 
@@ -409,11 +425,13 @@ class Dbjointpurchase extends Module
         $products[] = array('id_product' => $id_product);
         $productos = $this->prepareBlocksProducts($products);
 
-        $this->smarty->assign(array(
-                                  'products' => $productos,
-                                  'i' => $key,
-                                  'premium' => $this->premium,
-                              ));
+        $this->smarty->assign(
+            array(
+                'products' => $productos,
+                'i' => $key,
+                'premium' => $this->premium,
+            )
+        );
         return $this->fetch('module:dbjointpurchase/views/templates/hook/product_joint.tpl');
     }
 
